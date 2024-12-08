@@ -1,5 +1,5 @@
 public class Process {
-    private String name;
+    private final String name;
     private final int arrivalTime;
     private final int burstTime;
     private int remainingTime;

@@ -46,24 +46,30 @@ public class Scheduler
         printResults(processes);
     }
 
-    private void printResults(List<Process> processes) {
-        System.out.println("Process\tArrival Time\tBurst Time\tCompletion Time\tWaiting Time\tTurnaround Time");
-        int totalWaitingTime = 0;
-        int totalTurnaroundTime = 0;
+    public void printResults(List<Process> processes) {
+        System.out.println("\nProcess\tArrival Time\tBurst Time\tCompletion Time\tWaiting Time\tTurnaround Time");
+        System.out.println("-----------------------------------------------------------------------------------");
+
+        double totalWaitingTime = 0;
+        double totalTurnaroundTime = 0;
 
         for (Process process : processes) {
-            totalWaitingTime += process.getWaitingTime();
-            totalTurnaroundTime += process.getTurnaroundTime();
-            System.out.printf("%s\t%d\t\t%d\t\t%d\t\t%d\t\t%d\n",
+            System.out.printf("%-7s\t%-12d\t%-9d\t%-16d\t%-12d\t%-14d\n",
                     process.getName(),
                     process.getArrivalTime(),
                     process.getBurstTime(),
                     process.getCompletionTime(),
                     process.getWaitingTime(),
                     process.getTurnaroundTime());
+            totalWaitingTime += process.getWaitingTime();
+            totalTurnaroundTime += process.getTurnaroundTime();
         }
 
-        System.out.printf("Average Waiting Time: %.2f\n", (double) totalWaitingTime / processes.size());
-        System.out.printf("Average Turnaround Time: %.2f\n", (double) totalTurnaroundTime / processes.size());
+        double avgWaitingTime = totalWaitingTime / processes.size();
+        double avgTurnaroundTime = totalTurnaroundTime / processes.size();
+
+        System.out.println("-----------------------------------------------------------------------------------");
+        System.out.printf("Average Waiting Time: %.2f\n", avgWaitingTime);
+        System.out.printf("Average Turnaround Time: %.2f\n", avgTurnaroundTime);
     }
 }
