@@ -12,41 +12,39 @@ public class Scheduler
 
         List<Process> readyQueue = new ArrayList<>();
 
-        while (completed < n) {
+        while (completed < n)
+        {
             // Add processes to ready queue based on arrival time
-            for (Process process : processes) {
-                if (process.getArrivalTime() <= time && process.getRemainingTime() > 0 && !readyQueue.contains(process)) {
+            for (Process process : processes)
+                if (process.getArrivalTime() <= time && process.getRemainingTime() > 0 && !readyQueue.contains(process))
                     readyQueue.add(process);
-                }
-            }
 
-            // Sort ready queue by remaining time
+
             readyQueue.sort(Comparator.comparingInt(Process::getRemainingTime));
 
-            if (!readyQueue.isEmpty()) {
+            if (!readyQueue.isEmpty())
+            {
                 Process currentProcess = readyQueue.get(0);
                 currentProcess.setRemainingTime(currentProcess.getRemainingTime() - 1);
                 time++;
 
-                // Check if the process is completed
-                if (currentProcess.getRemainingTime() == 0) {
+                if (currentProcess.isCompleted())
+                {
                     completed++;
                     currentProcess.setCompletionTime(time);
                     currentProcess.setTurnaroundTime(currentProcess.getCompletionTime() - currentProcess.getArrivalTime());
                     currentProcess.setWaitingTime(currentProcess.getTurnaroundTime() - currentProcess.getBurstTime());
                     readyQueue.remove(currentProcess);
                 }
-            } else {
-                // If no process is ready, advance time
+            } else /// No Process is Ready
                 time++;
-            }
         }
 
-        // Print results
         printResults(processes);
     }
 
-    public void printResults(List<Process> processes) {
+    public void printResults(List<Process> processes)
+    {
         System.out.println("\nProcess\tArrival Time\tBurst Time\tCompletion Time\tWaiting Time\tTurnaround Time");
         System.out.println("-----------------------------------------------------------------------------------");
 
@@ -61,6 +59,7 @@ public class Scheduler
                     process.getCompletionTime(),
                     process.getWaitingTime(),
                     process.getTurnaroundTime());
+
             totalWaitingTime += process.getWaitingTime();
             totalTurnaroundTime += process.getTurnaroundTime();
         }

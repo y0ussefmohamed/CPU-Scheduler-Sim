@@ -1,4 +1,5 @@
-public class Process {
+public class Process
+{
     private final String name;
     private final int arrivalTime;
     private final int burstTime;
@@ -56,5 +57,9 @@ public class Process {
 
     public void setTurnaroundTime(int turnaroundTime) {
         this.turnaroundTime = turnaroundTime;
+    }
+
+    boolean isCompleted() {
+        return this.remainingTime == 0;
     }
 }
