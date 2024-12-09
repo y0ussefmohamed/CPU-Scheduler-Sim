@@ -76,8 +76,134 @@ public class Scheduler
         System.out.printf("Average Turnaround Time: %.2f\n", avgTurnaroundTime);
     }
 // ####################################################################################################################
+    public void nonPreemptiveSJF(List<Process> processes) {
+        processes.sort(Comparator.comparingInt(Process::getArrivalTime));
+        List<Process> readyQueue = new ArrayList<>();
+        List<Process> completedProcesses = new ArrayList<>();
+        int currentTime = 0;
 
+        while (!processes.isEmpty() || !readyQueue.isEmpty()) {
+            for (int i = 0; i < processes.size(); i++) {
+                if (processes.get(i).getArrivalTime() <= currentTime) {
+                    readyQueue.add(processes.remove(i));
+                    i--;
+                }
+            }
+            readyQueue.sort(Comparator.comparingInt(Process::getBurstTime));
 
+            if (!readyQueue.isEmpty()) {
+                Process current = readyQueue.remove(0); // Get the process with the shortest burst time
+                current.setWaitingTime(Math.max(0, currentTime - current.getArrivalTime()));
+                current.setCompletionTime(currentTime + current.getBurstTime());
+                current.setTurnaroundTime(current.getCompletionTime() - current.getArrivalTime());
+                currentTime += current.getBurstTime();
+
+                completedProcesses.add(current);
+                System.out.printf("Process %s executed at time %d.\n", current.getName(), currentTime);
+            } else {
+                currentTime++;
+            }
+        }
+
+        processes.addAll(completedProcesses);// Restore the completed processes for printing results
+        print_SJF_Results(processes);
+
+    }
+    public void print_SJF_Results(List<Process> processes) {
+        System.out.println("\nProcess\tArrival Time\tBurst Time\tCompletion Time\tWaiting Time\tTurnaround Time");
+        System.out.println("-----------------------------------------------------------------------------------");
+
+        double totalWaitingTime = 0;
+        double totalTurnaroundTime = 0;
+
+        for (Process process : processes) {
+            System.out.printf("%-7s\t%-12d\t%-9d\t%-16d\t%-12d\t%-14d\n",
+                    process.getName(),
+                    process.getArrivalTime(),
+                    process.getBurstTime(),
+                    process.getCompletionTime(),
+                    process.getWaitingTime(),
+                    process.getTurnaroundTime());
+
+            totalWaitingTime += process.getWaitingTime();
+            totalTurnaroundTime += process.getTurnaroundTime();
+        }
+
+        double avgWaitingTime = totalWaitingTime / processes.size();
+        double avgTurnaroundTime = totalTurnaroundTime / processes.size();
+
+        System.out.println("-----------------------------------------------------------------------------------");
+        System.out.printf("Average Waiting Time: %.2f\n", avgWaitingTime);
+        System.out.printf("Average Turnaround Time: %.2f\n", avgTurnaroundTime);
+    }
+
+// ####################################################################################################################
+    public void nonPreemptivePriority(List<Process> processes, int contextSwitchTime) {
+        processes.sort(Comparator.comparingInt(Process::getArrivalTime)); // Sort by arrival time
+        List<Process> readyQueue = new ArrayList<>();
+        List<Process> completedProcesses = new ArrayList<>();
+        int currentTime = 0;
+
+        while (!processes.isEmpty() || !readyQueue.isEmpty()) {
+            for (int i = 0; i < processes.size(); i++) {
+                if (processes.get(i).getArrivalTime() <= currentTime) {
+                    readyQueue.add(processes.remove(i));
+                    i--;
+                }
+            }
+            readyQueue.sort(Comparator.comparingInt(Process::getPriority));
+
+            if (!readyQueue.isEmpty()) {
+                if (!completedProcesses.isEmpty()) {
+                    System.out.printf("Context switching... Time: %d\n", currentTime);
+                    currentTime += contextSwitchTime;
+                }
+                Process current = readyQueue.remove(0);
+                current.setWaitingTime(Math.max(0, currentTime - current.getArrivalTime()));
+                current.setCompletionTime(currentTime + current.getBurstTime());
+                current.setTurnaroundTime(current.getCompletionTime() - current.getArrivalTime());
+                currentTime += current.getBurstTime();
+
+                completedProcesses.add(current);
+                System.out.printf("Process %s executed at time %d.\n", current.getName(), currentTime);
+            } else {
+                currentTime++;
+            }
+        }
+
+        processes.addAll(completedProcesses);
+        print_Priority_Results(processes);
+    }
+    public void print_Priority_Results(List<Process> processes) {
+        System.out.println("\nProcess\tArrival Time\tBurst Time\tPriority\tCompletion Time\tWaiting Time\tTurnaround Time");
+        System.out.println("-------------------------------------------------------------------------------------------------");
+
+        double totalWaitingTime = 0;
+        double totalTurnaroundTime = 0;
+
+        for (Process process : processes) {
+            System.out.printf("%-7s\t%-12d\t%-9d\t%-9d\t%-16d\t%-12d\t%-14d\n",
+                    process.getName(),
+                    process.getArrivalTime(),
+                    process.getBurstTime(),
+                    process.getPriority(),
+                    process.getCompletionTime(),
+                    process.getWaitingTime(),
+                    process.getTurnaroundTime());
+
+            totalWaitingTime += process.getWaitingTime();
+            totalTurnaroundTime += process.getTurnaroundTime();
+        }
+
+        double avgWaitingTime = totalWaitingTime / processes.size();
+        double avgTurnaroundTime = totalTurnaroundTime / processes.size();
+
+        System.out.println("-------------------------------------------------------------------------------------------------");
+        System.out.printf("Average Waiting Time: %.2f\n", avgWaitingTime);
+        System.out.printf("Average Turnaround Time: %.2f\n", avgTurnaroundTime);
+    }
+
+// ####################################################################################################################
     public void FCAI_Scheduling(List<Process> processes) {
         int time = 0;
         int completed = 0;
