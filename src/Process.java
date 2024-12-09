@@ -1,18 +1,21 @@
-public class Process
-{
+public class Process {
     private final String name;
     private final int arrivalTime;
     private final int burstTime;
+    private final int priority;
     private int remainingTime;
     private int completionTime;
     private int waitingTime;
     private int turnaroundTime;
+    private int quantum;
 
-    public Process(String name, int arrivalTime, int burstTime) {
+    public Process(String name, int arrivalTime, int burstTime, int priority, int initialQuantum) {
         this.name = name;
         this.arrivalTime = arrivalTime;
         this.burstTime = burstTime;
+        this.priority = priority;
         this.remainingTime = burstTime;
+        this.quantum = initialQuantum;
     }
 
     public String getName() {
@@ -25,6 +28,10 @@ public class Process
 
     public int getBurstTime() {
         return burstTime;
+    }
+
+    public int getPriority() {
+        return priority;
     }
 
     public int getRemainingTime() {
@@ -59,7 +66,15 @@ public class Process
         this.turnaroundTime = turnaroundTime;
     }
 
-    boolean isCompleted() {
+    public int getQuantum() {
+        return quantum;
+    }
+
+    public void setQuantum(int quantum) {
+        this.quantum = quantum;
+    }
+
+    public boolean isCompleted() {
         return this.remainingTime == 0;
     }
 }
