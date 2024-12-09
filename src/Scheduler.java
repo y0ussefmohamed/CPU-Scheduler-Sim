@@ -2,21 +2,19 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.*;
-
 import static java.lang.Math.ceil;
-import static java.lang.Math.max;
 
 public class Scheduler
 {
     public void SRTF_Scheduling(List<Process> processes)
     {
         int time = 0;
-        int completed = 0;
-        int n = processes.size();
+        int completedProcesses = 0;
+        int processesCount = processes.size();
 
         List<Process> readyQueue = new ArrayList<>();
 
-        while (completed < n)
+        while (completedProcesses < processesCount)
         {
             // Add processes to ready queue based on arrival time
             for (Process process : processes)
@@ -28,13 +26,13 @@ public class Scheduler
 
             if (!readyQueue.isEmpty())
             {
-                Process currentProcess = readyQueue.get(0);
+                Process currentProcess = readyQueue.get(0); // Shortest remaining time process
                 currentProcess.setRemainingTime(currentProcess.getRemainingTime() - 1);
                 time++;
 
                 if (currentProcess.isCompleted())
                 {
-                    completed++;
+                    completedProcesses++;
                     currentProcess.setCompletionTime(time);
                     currentProcess.setTurnaroundTime(currentProcess.getCompletionTime() - currentProcess.getArrivalTime());
                     currentProcess.setWaitingTime(currentProcess.getTurnaroundTime() - currentProcess.getBurstTime());
@@ -75,7 +73,7 @@ public class Scheduler
         System.out.printf("Average Waiting Time: %.2f\n", avgWaitingTime);
         System.out.printf("Average Turnaround Time: %.2f\n", avgTurnaroundTime);
     }
-// ####################################################################################################################
+    // ####################################################################################################################
     public void nonPreemptiveSJF(List<Process> processes) {
         processes.sort(Comparator.comparingInt(Process::getArrivalTime));
         List<Process> readyQueue = new ArrayList<>();
@@ -137,7 +135,7 @@ public class Scheduler
         System.out.printf("Average Turnaround Time: %.2f\n", avgTurnaroundTime);
     }
 
-// ####################################################################################################################
+    // ####################################################################################################################
     public void nonPreemptivePriority(List<Process> processes, int contextSwitchTime) {
         processes.sort(Comparator.comparingInt(Process::getArrivalTime)); // Sort by arrival time
         List<Process> readyQueue = new ArrayList<>();
@@ -203,7 +201,7 @@ public class Scheduler
         System.out.printf("Average Turnaround Time: %.2f\n", avgTurnaroundTime);
     }
 
-// ####################################################################################################################
+    // ####################################################################################################################
     public void FCAI_Scheduling(List<Process> processes) {
         int time = 0;
         int completed = 0;
