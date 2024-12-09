@@ -19,13 +19,12 @@ public class Main {
 
         if (choice < 1 || choice > 4) {
             System.out.println("Invalid choice! Exiting program.");
-            return; // Exit if the choice is invalid
+            return;
         }
 
         System.out.print("Enter number of processes: ");
         int processesCount = scanner.nextInt();
-        System.out.print("Enter value of contextSwitching: ");
-        int contextSwitching= scanner.nextInt();
+
 
         List<Process> processes = new ArrayList<>();
         for (int i = 0; i < processesCount; i++) {
@@ -55,7 +54,7 @@ public class Main {
                 int burstTime = scanner.nextInt();
                 processes.add(new Process(name, arrivalTime, burstTime, 0, 0));
             }
-            else if(choice == 4)
+            else
             {
                 System.out.printf("Enter details for Process %d (Name, Arrival Time, Burst Time,priority): ", i + 1);
                 String name = scanner.next();
@@ -72,8 +71,12 @@ public class Main {
             scheduler.FCAI_Scheduling(processes);
         else if (choice == 3)
             scheduler.nonPreemptiveSJF(processes);
-        else if (choice == 4)
+        else {
+            System.out.print("Enter value of contextSwitching: ");
+            int contextSwitching= scanner.nextInt();
             scheduler.nonPreemptivePriority(processes,contextSwitching);
+        }
+
 
         scanner.close();
     }
