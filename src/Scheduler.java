@@ -258,7 +258,6 @@ public class Scheduler
                     }
                 }
 
-                // Check for preemption
                 if (currentProcess.getRemainingTime() > 0) {
                     List<Process> updatedProcesses = new ArrayList<>(readyQueue);
 
@@ -283,7 +282,7 @@ public class Scheduler
                     currentProcess.setTurnaroundTime(currentProcess.getCompletionTime() - currentProcess.getArrivalTime());
                     currentProcess.setWaitingTime(currentProcess.getTurnaroundTime() - currentProcess.getBurstTime());
                 } else {
-                    for (int i = 0; (i < quantum - executionTime) && (!currentProcess.isCompleted()); i++) {
+                    for (int i = 1; (i <= quantum - executionTime) && (!currentProcess.isCompleted()); i++) {
                         currentProcess.setRemainingTime(currentProcess.getRemainingTime() - 1);
                         time++;
                         for (Process process : processes) {
