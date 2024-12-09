@@ -44,10 +44,10 @@ public class Scheduler
                 time++;
         }
 
-        printResultss(processes);
+        print_SRTF_Results(processes);
     }
 
-    public void printResultss(List<Process> processes)
+    public void print_SRTF_Results(List<Process> processes)
     {
         System.out.println("\nProcess\tArrival Time\tBurst Time\tCompletion Time\tWaiting Time\tTurnaround Time");
         System.out.println("-----------------------------------------------------------------------------------");
