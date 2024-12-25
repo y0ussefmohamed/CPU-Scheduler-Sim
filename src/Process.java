@@ -3,6 +3,8 @@ public class Process {
     private final int arrivalTime;
     private final int burstTime;
     private final int priority;
+    private int adjustedBurstTime;
+    private int adjustedRemainingTime;
     private int remainingTime;
     private int completionTime;
     private int waitingTime;
@@ -76,5 +78,21 @@ public class Process {
 
     public boolean isCompleted() {
         return this.remainingTime == 0;
+    }
+
+    public int getAdjustedBurstTime() {
+        return adjustedBurstTime;
+    }
+
+    public void setAdjustedBurstTime(int adjustedBurstTime) {
+        this.adjustedBurstTime = adjustedBurstTime;
+    }
+
+    public int getAdjustedRemainingTime() {
+        return adjustedRemainingTime;
+    }
+
+    public void setAdjustedRemainingTime(int adjustedRemainingTime) {
+        this.adjustedRemainingTime = adjustedRemainingTime;
     }
 }
