@@ -227,21 +227,24 @@ public class Scheduler
                 int finalTime1 = time;
                 sortedProcesses.sort(Comparator.comparingInt(p -> calculateFCAIFactor(p, finalTime1, v1, v2)));
                 Process currentProcess;
-                if(!interrupt){
+                if (!interrupt) {
                     currentProcess = readyQueue.poll();
-                }
-                else {
+                } else {
                     currentProcess = sortedProcesses.get(0);
                     readyQueue.remove(currentProcess);
                 }
                 interrupt = false;
 
                 int quantum = currentProcess.getQuantum();
-                int executionTime = (int) ceil(quantum * 0.4);
+                int executionTime = (int) Math.ceil(quantum * 0.4);
 
                 if (executionTime > currentProcess.getRemainingTime()) {
                     executionTime = currentProcess.getRemainingTime();
                 }
+
+                // Log the process and its quantum before execution
+                System.out.println("Time: " + time + " - Executing process: " + currentProcess.getName()
+                        + " with quantum: " + quantum);
 
                 // Execute the process for 40% of the quantum
                 for (int i = 0; i < executionTime; i++) {
@@ -268,6 +271,8 @@ public class Scheduler
                         readyQueue.remove(currentProcess);
                         readyQueue.add(currentProcess);
                         interrupt = true;
+                        System.out.println("Process " + currentProcess.getName() + " quantum updated to: "
+                                + currentProcess.getQuantum());
                         continue;
                     }
                 }
@@ -279,6 +284,9 @@ public class Scheduler
                     currentProcess.setCompletionTime(time);
                     currentProcess.setTurnaroundTime(currentProcess.getCompletionTime() - currentProcess.getArrivalTime());
                     currentProcess.setWaitingTime(currentProcess.getTurnaroundTime() - currentProcess.getBurstTime());
+
+                    // Log the process completion
+                    System.out.println("Time: " + time + " - Process " + currentProcess.getName() + " is completed.");
                 } else {
                     for (int i = 1; (i <= quantum - executionTime) && (!currentProcess.isCompleted()); i++) {
                         currentProcess.setRemainingTime(currentProcess.getRemainingTime() - 1);
@@ -300,11 +308,13 @@ public class Scheduler
                             readyQueue.remove(currentProcess);
                             readyQueue.add(currentProcess);
                             interrupt = true;
+                            System.out.println("Process " + currentProcess.getName() + " quantum updated to: "
+                                    + currentProcess.getQuantum());
                             break;
                         }
                     }
-                    if(interrupt)
-                        continue;
+                    if (interrupt) continue;
+
                     if (currentProcess.isCompleted()) {
                         currentProcess.setCompletionTime(time);
                         currentProcess.setTurnaroundTime(currentProcess.getCompletionTime() - currentProcess.getArrivalTime());
@@ -312,9 +322,13 @@ public class Scheduler
                         readyQueue.remove(currentProcess); // Remove from the queue
                         completed++; // Update completed count
                         interrupt = false; // Reset preemption flag
-                    }
-                    else {
+
+                        // Log the process completion
+                        System.out.println("Time: " + time + " - Process " + currentProcess.getName() + " is completed.");
+                    } else {
                         currentProcess.setQuantum(currentProcess.getQuantum() + 2);
+                        System.out.println("Process " + currentProcess.getName() + " quantum updated to: "
+                                + currentProcess.getQuantum());
                         readyQueue.remove(currentProcess);
                         readyQueue.add(currentProcess);
                     }
@@ -326,6 +340,7 @@ public class Scheduler
 
         printResults(processes);
     }
+
 
     private double calculateV1(List<Process> processes) {
         int lastArrivalTime = processes.stream().mapToInt(Process::getArrivalTime).max().orElse(1);
