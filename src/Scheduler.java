@@ -91,7 +91,7 @@ public class Scheduler
 
             if (!readyQueue.isEmpty()) {
                 Process current = readyQueue.remove(0); // Get the process with the shortest burst time
-                current.setWaitingTime(Math.max(0, currentTime - current.getArrivalTime()));
+                current.setWaitingTime(currentTime - current.getArrivalTime());
                 current.setCompletionTime(currentTime + current.getBurstTime());
                 current.setTurnaroundTime(current.getCompletionTime() - current.getArrivalTime());
                 currentTime += current.getBurstTime();
@@ -137,7 +137,7 @@ public class Scheduler
 
     // ####################################################################################################################
     public void nonPreemptivePriority(List<Process> processes, int contextSwitchTime) {
-        processes.sort(Comparator.comparingInt(Process::getArrivalTime)); // Sort by arrival time
+        processes.sort(Comparator.comparingInt(Process::getArrivalTime));
         List<Process> readyQueue = new ArrayList<>();
         List<Process> completedProcesses = new ArrayList<>();
         int currentTime = 0;
@@ -153,13 +153,12 @@ public class Scheduler
 
             if (!readyQueue.isEmpty()) {
                 if (!completedProcesses.isEmpty()) {
-                    System.out.printf("Context switching... Time: %d\n", currentTime);
                     currentTime += contextSwitchTime;
                 }
                 Process current = readyQueue.remove(0);
-                current.setWaitingTime(Math.max(0, currentTime - current.getArrivalTime()));
+                current.setWaitingTime(currentTime - current.getArrivalTime());
                 current.setCompletionTime(currentTime + current.getBurstTime());
-                current.setTurnaroundTime(current.getCompletionTime() - current.getArrivalTime());
+                current.setTurnaroundTime(current.getWaitingTime() +current.getBurstTime());
                 currentTime += current.getBurstTime();
 
                 completedProcesses.add(current);
