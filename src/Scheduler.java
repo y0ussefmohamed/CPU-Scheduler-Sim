@@ -6,42 +6,52 @@ import static java.lang.Math.ceil;
 
 public class Scheduler
 {
-    public void SRTF_Scheduling(List<Process> processes)
-    {
-        int time = 0;
-        int completedProcesses = 0;
-        int processesCount = processes.size();
-
+   public void SRTF_Scheduling(List<Process> processes) {
+        processes.sort(Comparator.comparingInt(Process::getArrivalTime));
         List<Process> readyQueue = new ArrayList<>();
+        List<Process> completedProcesses = new ArrayList<>();
+        int currentTime = 0;
+        int agingFactor = 1; // Factor to apply aging, can be adjusted
 
-        while (completedProcesses < processesCount)
-        {
-            // Add processes to ready queue based on arrival time
-            for (Process process : processes)
-                if (process.getArrivalTime() <= time && process.getRemainingTime() > 0 && !readyQueue.contains(process))
-                    readyQueue.add(process);
-
-
-            readyQueue.sort(Comparator.comparingInt(Process::getRemainingTime));
-
-            if (!readyQueue.isEmpty())
-            {
-                Process currentProcess = readyQueue.get(0); // Shortest remaining time process
-                currentProcess.setRemainingTime(currentProcess.getRemainingTime() - 1);
-                time++;
-
-                if (currentProcess.isCompleted())
-                {
-                    completedProcesses++;
-                    currentProcess.setCompletionTime(time);
-                    currentProcess.setTurnaroundTime(currentProcess.getCompletionTime() - currentProcess.getArrivalTime());
-                    currentProcess.setWaitingTime(currentProcess.getTurnaroundTime() - currentProcess.getBurstTime());
-                    readyQueue.remove(currentProcess);
+        while (!processes.isEmpty() || !readyQueue.isEmpty()) {
+            // Move processes to the ready queue
+            for (int i = 0; i < processes.size(); i++) {
+                if (processes.get(i).getArrivalTime() <= currentTime) {
+                    readyQueue.add(processes.remove(i));
+                    i--;
                 }
-            } else /// No Process is Ready
-                time++;
+            }
+
+            // Apply aging: Adjust remaining time for long-waiting processes in the ready queue
+            for (Process p : readyQueue) {
+                int waitingTime = currentTime - (p.getArrivalTime() + (p.getBurstTime() - p.getRemainingTime()));
+                p.setAdjustedRemainingTime(Math.max(1, p.getRemainingTime() - waitingTime / agingFactor));
+            }
+
+            // Sort the ready queue by adjusted remaining time
+            readyQueue.sort(Comparator.comparingInt(Process::getAdjustedRemainingTime));
+
+            if (!readyQueue.isEmpty()) {
+                // Execute the process with the shortest adjusted remaining time
+                Process current = readyQueue.get(0);
+                current.setRemainingTime(current.getRemainingTime() - 1);
+                currentTime++;
+
+                if (current.getRemainingTime() == 0) {
+                    // Process completed
+                    readyQueue.remove(current);
+                    current.setCompletionTime(currentTime);
+                    current.setTurnaroundTime(current.getCompletionTime() - current.getArrivalTime());
+                    current.setWaitingTime(current.getTurnaroundTime() - current.getBurstTime());
+                    completedProcesses.add(current);
+                    System.out.printf("Process %s completed at time %d.\n", current.getName(), currentTime);
+                }
+            } else {
+                currentTime++;
+            }
         }
 
+        processes.addAll(completedProcesses); // Restore the completed processes for printing results
         print_SRTF_Results(processes);
     }
 
@@ -74,23 +84,34 @@ public class Scheduler
         System.out.printf("Average Turnaround Time: %.2f\n", avgTurnaroundTime);
     }
     // ####################################################################################################################
-    public void nonPreemptiveSJF(List<Process> processes) {
+   public void nonPreemptiveSJF(List<Process> processes) {
         processes.sort(Comparator.comparingInt(Process::getArrivalTime));
         List<Process> readyQueue = new ArrayList<>();
         List<Process> completedProcesses = new ArrayList<>();
         int currentTime = 0;
+        int agingFactor = 1; // Increment to reduce burst time for aging
 
         while (!processes.isEmpty() || !readyQueue.isEmpty()) {
+            // Move processes to the ready queue
             for (int i = 0; i < processes.size(); i++) {
                 if (processes.get(i).getArrivalTime() <= currentTime) {
                     readyQueue.add(processes.remove(i));
                     i--;
                 }
             }
-            readyQueue.sort(Comparator.comparingInt(Process::getBurstTime));
+
+            // Apply aging: decrease burst time for long-waiting processes in the ready queue
+            for (Process p : readyQueue) {
+                int waitingTime = currentTime - p.getArrivalTime();
+                p.setAdjustedBurstTime(Math.max(1, p.getBurstTime() - waitingTime / agingFactor));
+            }
+
+            // Sort the ready queue by adjusted burst time
+            readyQueue.sort(Comparator.comparingInt(Process::getAdjustedBurstTime));
 
             if (!readyQueue.isEmpty()) {
-                Process current = readyQueue.remove(0); // Get the process with the shortest burst time
+                // Execute the process with the shortest adjusted burst time
+                Process current = readyQueue.remove(0);
                 current.setWaitingTime(currentTime - current.getArrivalTime());
                 current.setCompletionTime(currentTime + current.getBurstTime());
                 current.setTurnaroundTime(current.getCompletionTime() - current.getArrivalTime());
@@ -103,9 +124,8 @@ public class Scheduler
             }
         }
 
-        processes.addAll(completedProcesses);// Restore the completed processes for printing results
+        processes.addAll(completedProcesses); // Restore the completed processes for printing results
         print_SJF_Results(processes);
-
     }
     public void print_SJF_Results(List<Process> processes) {
         System.out.println("\nProcess\tArrival Time\tBurst Time\tCompletion Time\tWaiting Time\tTurnaround Time");
